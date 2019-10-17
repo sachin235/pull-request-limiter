@@ -11,7 +11,7 @@ module.exports = app => {
   // main function entry-point
   async function handlePullRequestCreated(context) {
     // get payload from context
-    var payload = context.payload
+    var { payload } = context
 
     // get author of the pull request
     var author = getAuthor(payload)
@@ -21,14 +21,16 @@ module.exports = app => {
 
     // construct query string to get all pull requests
     // created by an author in the current repository
-    var queryString = `repo:${repo} author:${author} is:pr`
+    var queryString = `repo:${repo} author:${author} is:pr type:pr`
+    app.log(queryString)
 
     // search github using the constructed query string
-    var searchedPullRequestsContext = await context.github.search.issues({q : queryString})
+    var response = await context.github.search.issuesAndPullRequests({q: queryString})
+    var count = getCountOfValidPullRequests(response)
 
 
-    const issueComment = context.issue({ body: 'Thanks for editing the issue!' })
-    return context.github.issues.createComment(issueComment)
+    // const issueComment = context.issue({ body: 'Thanks for editing the issue!' })
+    // return context.github.issues.createComment(issueComment)
   }
 
   function getAuthor(payload) {
@@ -37,6 +39,11 @@ module.exports = app => {
 
   function getRepository(payload) {
     return payload.repository.full_name
+  }
+
+  function getCountOfValidPullRequests(response) {
+    var { data } = response
+    var { items, total_count } = data
   }
 
   // For more information on building apps:
