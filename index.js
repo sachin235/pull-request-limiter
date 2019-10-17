@@ -10,16 +10,18 @@ module.exports = app => {
 
   // main function entry-point
   async function handlePullRequestCreated(context) {
+    var payload = context.payload
+
     const issueComment = context.issue({ body: 'Thanks for editing the issue!' })
     return context.github.issues.createComment(issueComment)
   }
 
-  function getAuthor(context) {
-    return context.payload.issue.user.login
+  function getAuthor(payload) {
+    return payload.issue.user.login
   }
 
-  function getRepository(context) {
-    return context.payload.repository.full_name
+  function getRepository(payload) {
+    return payload.repository.full_name
   }
 
   // For more information on building apps:
