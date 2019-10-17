@@ -10,7 +10,22 @@ module.exports = app => {
 
   // main function entry-point
   async function handlePullRequestCreated(context) {
+    // get payload from context
     var payload = context.payload
+
+    // get author of the pull request
+    var author = getAuthor(payload)
+
+    // get the repository from context
+    var repo = getRepository(payload)
+
+    // construct query string to get all pull requests
+    // created by an author in the current repository
+    var queryString = `repo:${repo} author:${author} is:pr`
+
+    // search github using the constructed query string
+    var searchedPullRequestsContext = await context.github.search.issues({q : queryString})
+
 
     const issueComment = context.issue({ body: 'Thanks for editing the issue!' })
     return context.github.issues.createComment(issueComment)
