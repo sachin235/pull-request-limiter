@@ -69,7 +69,18 @@ module.exports = app => {
   }
 
   function addLabelAndClosePullRequest(context, labels) {
+    addLabels(context, labels)
+    closePullRequest(context)
+  }
 
+  function addLabels(context, labels) {
+    var pullRequestLabels = context.issue({labels: labels})
+    context.github.issues.addLabels(pullRequestLabels)
+  }
+
+  function closePullRequest(context) {
+    var pullRequestClosedState = context.issue({state: "closed"})
+    context.github.pulls.update(pullRequestClosedState)
   }
 
   // For more information on building apps:
