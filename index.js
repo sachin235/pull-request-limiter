@@ -19,6 +19,12 @@ module.exports = app => {
     // get the repository from context
     var repo = getRepository(payload)
 
+    // labels to be applied before closing
+    var closingLabels = ["invalid"]
+
+    // maximum number of allowed pull requests
+    var threshold = 2
+
     // construct query string to get all pull requests
     // created by an author in the current repository
     var queryString = `repo:${repo} author:${author} is:pr type:pr`
@@ -27,6 +33,10 @@ module.exports = app => {
     // search github using the constructed query string
     var response = await context.github.search.issuesAndPullRequests({q: queryString})
     var count = getCountOfValidPullRequests(response)
+
+    if(count > threshold) {
+      addLabelAndClosePullRequest(context, closingLabels)
+    }
 
 
     // const issueComment = context.issue({ body: 'Thanks for editing the issue!' })
@@ -43,7 +53,23 @@ module.exports = app => {
 
   function getCountOfValidPullRequests(response) {
     var { data } = response
-    var { items, total_count } = data
+    var { items } = data
+
+    var filteredPullRequests = items.filter(item => {
+      var labels = item.labels.map(label => label.name)
+      return !filterPullRequestsUsingLabels(labels)
+    })
+
+    return filteredPullRequests.length
+  }
+
+  function filterPullRequestsUsingLabels(labels) {
+    invalidLabel = "invalid"
+    return labels.includes(invalidLabel)
+  }
+
+  function addLabelAndClosePullRequest(context, labels) {
+
   }
 
   // For more information on building apps:
