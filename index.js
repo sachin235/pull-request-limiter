@@ -28,7 +28,7 @@ module.exports = app => {
 
     // construct query string to get all pull requests
     // created by an author in the current repository
-    var queryString = `repo:${repo} author:${author} is:pr type:pr`
+    var queryString = `repo:${repo}+author:${author}+is:pr+type:pr`
     app.log(queryString)
 
     // search github using the constructed query string
