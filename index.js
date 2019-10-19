@@ -1,14 +1,15 @@
 /**
- * This is the main entrypoint to your Probot app
+ * This is the main entrypoint to the Probot app
  * @param {import('probot').Application} app
  */
 module.exports = app => {
-  // Your code here
-  app.log('Yay, the app was loaded!')
-
   app.on('pull_request.opened', handlePullRequestCreated)
 
-  // main function entry-point
+  /**
+   * This method is executed when {pull_request.opened} event is fired
+   * and is the main entry point
+   * @param {import('probot').Context} context 
+   */
   async function handlePullRequestCreated(context) {
     // get payload from context
     var { payload } = context
@@ -37,20 +38,31 @@ module.exports = app => {
     if(count > threshold) {
       addLabelAndClosePullRequest(context, closingLabels)
     }
-
-
-    // const issueComment = context.issue({ body: 'Thanks for editing the issue!' })
-    // return context.github.issues.createComment(issueComment)
   }
 
+  /**
+   * This method returns author of pull request
+   * @param payload - the payload data provided by Github
+   */
   function getAuthor(payload) {
     return payload.pull_request.user.login
   }
 
+  /**
+   * This method returns the full name of the base repository in the format
+   * organisation/repository or
+   * user/repository
+   * @param payload - the payload data provided by Github
+   */
   function getRepository(payload) {
     return payload.repository.full_name
   }
 
+
+  /**
+   * This method returns a list of valid pull requests
+   * @param response - the response returned from request
+   */
   function getValidPullRequests(response) {
     var { data } = response
     var { items } = data
@@ -63,33 +75,50 @@ module.exports = app => {
     return filteredPullRequests
   }
 
+  /**
+   * This method returns count of valid pull requests
+   * @param response - the response returned from request
+   */
   function getCountOfValidPullRequests(response) {
     return getValidPullRequests(response).length
   }
 
+  /**
+   * This method checks if the specified label
+   * is present in the list of given labels or not
+   * @param labels - the list of labels to check in
+   */
   function filterPullRequestsUsingLabels(labels) {
     invalidLabel = "invalid"
     return labels.includes(invalidLabel)
   }
 
+  /**
+   * This method adds labels and closes the current pull request
+   * @param context - the context of the event
+   * @param labels - the list of labels to apply
+   */
   function addLabelAndClosePullRequest(context, labels) {
     addLabels(context, labels)
     closePullRequest(context)
   }
 
+  /**
+   * This method applies labels to the current pull request
+   * @param context - the context of the event
+   * @param labels - the list of labels to apply
+   */
   function addLabels(context, labels) {
     var pullRequestLabels = context.issue({labels: labels})
     context.github.issues.addLabels(pullRequestLabels)
   }
 
+  /**
+   * This method closes the current pull request
+   * @param context - the context of the event
+   */
   function closePullRequest(context) {
     var pullRequestClosedState = context.issue({state: "closed"})
     context.github.pulls.update(pullRequestClosedState)
   }
-
-  // For more information on building apps:
-  // https://probot.github.io/docs/
-
-  // To get your app running against GitHub, see:
-  // https://probot.github.io/docs/development/
 }
