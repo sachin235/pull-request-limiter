@@ -35,7 +35,7 @@ module.exports = app => {
     var response = await context.github.search.issuesAndPullRequests({q: queryString})
     var count = getCountOfValidPullRequests(response)
 
-    if(count > threshold) {
+    if(count > threshold-1) {
       addLabelAndClosePullRequest(context, closingLabels)
     }
   }
