@@ -88,7 +88,7 @@ module.exports = app => {
    * @param labels - the list of labels to check in
    */
   function filterPullRequestsUsingLabels (labels) {
-    invalidLabel = 'invalid'
+    var invalidLabel = 'invalid'
     return labels.includes(invalidLabel)
   }
 
