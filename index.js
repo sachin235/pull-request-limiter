@@ -6,7 +6,7 @@ module.exports = app => {
   // Your code here
   app.log('Yay, the app was loaded!')
 
-  app.on('issues.edited', handlePullRequestCreated)
+  app.on('pull_request.opened', handlePullRequestCreated)
 
   // main function entry-point
   async function handlePullRequestCreated(context) {
