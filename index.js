@@ -44,7 +44,7 @@ module.exports = app => {
   }
 
   function getAuthor(payload) {
-    return payload.issue.user.login
+    return payload.pull_request.user.login
   }
 
   function getRepository(payload) {
