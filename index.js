@@ -51,7 +51,7 @@ module.exports = app => {
     return payload.repository.full_name
   }
 
-  function getCountOfValidPullRequests(response) {
+  function getValidPullRequests(response) {
     var { data } = response
     var { items } = data
 
@@ -60,7 +60,11 @@ module.exports = app => {
       return !filterPullRequestsUsingLabels(labels)
     })
 
-    return filteredPullRequests.length
+    return filteredPullRequests
+  }
+
+  function getCountOfValidPullRequests(response) {
+    return getValidPullRequests(response).length
   }
 
   function filterPullRequestsUsingLabels(labels) {
