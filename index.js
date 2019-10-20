@@ -8,9 +8,9 @@ module.exports = app => {
   /**
    * This method is executed when {pull_request.opened} event is fired
    * and is the main entry point
-   * @param {import('probot').Context} context 
+   * @param {import('probot').Context} context
    */
-  async function handlePullRequestCreated(context) {
+  async function handlePullRequestCreated (context) {
     // get payload from context
     var { payload } = context
 
@@ -21,7 +21,7 @@ module.exports = app => {
     var repo = getRepository(payload)
 
     // labels to be applied before closing
-    var closingLabels = ["invalid"]
+    var closingLabels = ['invalid']
 
     // maximum number of allowed pull requests
     var threshold = 2
@@ -32,10 +32,10 @@ module.exports = app => {
     app.log(queryString)
 
     // search github using the constructed query string
-    var response = await context.github.search.issuesAndPullRequests({q: queryString})
+    var response = await context.github.search.issuesAndPullRequests({ q: queryString })
     var count = getCountOfValidPullRequests(response)
 
-    if(count > threshold-1) {
+    if (count > threshold - 1) {
       addLabelAndClosePullRequest(context, closingLabels)
     }
   }
@@ -44,7 +44,7 @@ module.exports = app => {
    * This method returns author of pull request
    * @param payload - the payload data provided by Github
    */
-  function getAuthor(payload) {
+  function getAuthor (payload) {
     return payload.pull_request.user.login
   }
 
@@ -54,16 +54,15 @@ module.exports = app => {
    * user/repository
    * @param payload - the payload data provided by Github
    */
-  function getRepository(payload) {
+  function getRepository (payload) {
     return payload.repository.full_name
   }
-
 
   /**
    * This method returns a list of valid pull requests
    * @param response - the response returned from request
    */
-  function getValidPullRequests(response) {
+  function getValidPullRequests (response) {
     var { data } = response
     var { items } = data
 
@@ -79,7 +78,7 @@ module.exports = app => {
    * This method returns count of valid pull requests
    * @param response - the response returned from request
    */
-  function getCountOfValidPullRequests(response) {
+  function getCountOfValidPullRequests (response) {
     return getValidPullRequests(response).length
   }
 
@@ -88,8 +87,8 @@ module.exports = app => {
    * is present in the list of given labels or not
    * @param labels - the list of labels to check in
    */
-  function filterPullRequestsUsingLabels(labels) {
-    invalidLabel = "invalid"
+  function filterPullRequestsUsingLabels (labels) {
+    var invalidLabel = 'invalid'
     return labels.includes(invalidLabel)
   }
 
@@ -98,7 +97,7 @@ module.exports = app => {
    * @param context - the context of the event
    * @param labels - the list of labels to apply
    */
-  function addLabelAndClosePullRequest(context, labels) {
+  function addLabelAndClosePullRequest (context, labels) {
     addLabels(context, labels)
     closePullRequest(context)
   }
@@ -108,8 +107,8 @@ module.exports = app => {
    * @param context - the context of the event
    * @param labels - the list of labels to apply
    */
-  function addLabels(context, labels) {
-    var pullRequestLabels = context.issue({labels: labels})
+  function addLabels (context, labels) {
+    var pullRequestLabels = context.issue({ labels: labels })
     context.github.issues.addLabels(pullRequestLabels)
   }
 
@@ -117,8 +116,8 @@ module.exports = app => {
    * This method closes the current pull request
    * @param context - the context of the event
    */
-  function closePullRequest(context) {
-    var pullRequestClosedState = context.issue({state: "closed"})
+  function closePullRequest (context) {
+    var pullRequestClosedState = context.issue({ state: 'closed' })
     context.github.pulls.update(pullRequestClosedState)
   }
 }
